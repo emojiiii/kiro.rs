@@ -111,13 +111,8 @@ fn resolve_usage_input_tokens(
     )
 }
 
-/// GET /v1/models
-///
-/// 返回可用的模型列表
-pub async fn get_models() -> impl IntoResponse {
-    tracing::info!("Received GET /v1/models request");
-
-    let models = vec![
+fn available_models() -> Vec<Model> {
+    vec![
         Model {
             id: "claude-opus-4-7".to_string(),
             object: "model".to_string(),
@@ -226,7 +221,16 @@ pub async fn get_models() -> impl IntoResponse {
             model_type: "chat".to_string(),
             max_tokens: 64000,
         },
-    ];
+    ]
+}
+
+/// GET /v1/models
+///
+/// 返回可用的模型列表
+pub async fn get_models() -> impl IntoResponse {
+    tracing::info!("Received GET /v1/models request");
+
+    let models = available_models();
 
     Json(ModelsResponse {
         object: "list".to_string(),
@@ -1053,4 +1057,18 @@ fn create_buffered_sse_stream(
         },
     )
     .flatten()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn available_models_include_opus_4_7_variants() {
+        let models = available_models();
+        let ids: Vec<&str> = models.iter().map(|model| model.id.as_str()).collect();
+
+        assert!(ids.contains(&"claude-opus-4-7"));
+        assert!(ids.contains(&"claude-opus-4-7-thinking"));
+    }
 }

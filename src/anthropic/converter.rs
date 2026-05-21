@@ -147,12 +147,12 @@ pub fn map_model(model: &str) -> Option<String> {
             None
         }
     } else if model_lower.contains("opus") {
-        if model_lower.contains("4-5") || model_lower.contains("4.5") {
+        if model_lower.contains("4-7") || model_lower.contains("4.7") {
+            Some("claude-opus-4.7".to_string())
+        } else if model_lower.contains("4-5") || model_lower.contains("4.5") {
             Some("claude-opus-4.5".to_string())
         } else if model_lower.contains("4-6") || model_lower.contains("4.6") {
             Some("claude-opus-4.6".to_string())
-        } else if model_lower.contains("4-7") || model_lower.contains("4.7") {
-            Some("claude-opus-4.7".to_string())
         } else {
             None
         }
@@ -982,6 +982,19 @@ mod tests {
                 .unwrap()
                 .contains("opus")
         );
+    }
+
+    #[test]
+    fn test_map_model_opus_4_7() {
+        assert_eq!(
+            map_model("claude-opus-4-7"),
+            Some("claude-opus-4.7".to_string())
+        );
+        assert_eq!(
+            map_model("claude-opus-4.7-thinking"),
+            Some("claude-opus-4.7".to_string())
+        );
+        assert_eq!(get_context_window_size("claude-opus-4-7"), 1_000_000);
     }
 
     #[test]
